@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+    <fieldset class="justify-content-start">
+        <h1 class="my-3 text-center">Editar lista</h1>
+        <div class="row justify-content-center align-items-center h-100">
+            <div class="col-4">
+                <form action="" method="POST">
+                    {{ form.hidden_tag() }}
+                    <div>
+                        {{ form.nome.label(class="form-control-label") }}
+                        {% if form.nome.errors %}
+                            {{ form.nome(class="form-control form-control-md is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.nome.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.nome(class="form-control mb-3 form-control-md", placeholder=lista.nome) }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.descricao.label(class="form-control-label") }}
+                        {% if form.descricao.errors %}
+                            {{ form.descricao(class="form-control form-control-md is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.descricao.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.descricao(class="form-control mb-3 form-control-md", placeholder=lista.descricao) }}
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col float-start">
+                            <a class="btn btn-secondary btn-md float-start" href="{{ url_for('listas') }}">Cancelar</a>
+                        </div>
+                        <div class="col float-end">
+                            {{ form.submit(class="btn btn-primary float-end") }}
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </fieldset>
+{% endblock content %}

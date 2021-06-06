@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="justify-content-start">
+        <h1 class="my-3 text-center">Editar tarefa</h1>
+        <div class="row justify-content-center align-items-center h-100">
+            <div class="col-4">
+                <form action="" method="POST">
+                    {{ form.hidden_tag() }}
+                    <div>
+                        {{ form.titulo.label(class="form-control-label") }}
+                        {% if form.titulo.errors %}
+                            {{ form.titulo(class="form-control form-control-md is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.titulo.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.titulo(class="form-control mb-3 form-control-md", placeholder=tarefa.titulo) }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.descricao.label(class="form-control-label") }}
+                        {% if form.descricao.errors %}
+                            {{ form.descricao(class="form-control form-control-md is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.descricao.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.descricao(class="form-control mb-3 form-control-md", placeholder=tarefa.descricao) }}
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col float-start">
+                            <a class="btn btn-secondary btn-md float-start" href="{{ url_for('listas', id_lista=id_lista) }}">Cancelar</a>
+                        </div>
+                        <div class="col float-end">
+                            {{ form.submit(class="btn btn-primary float-end") }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
