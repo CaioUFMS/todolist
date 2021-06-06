@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from todoapp.models import Usuario, Lista
+from todoapp.models import Usuario
 
 
 class FormCadastro(FlaskForm):
@@ -35,10 +35,10 @@ class FormLista(FlaskForm):
 
 class FormTarefa(FlaskForm):
     titulo = StringField('Título da tarefa', validators=[DataRequired()])
-    descricao = TextAreaField('Descrição da tarefa', validators=[DataRequired(), Length(min=0, max=100,
+    descricao = TextAreaField('Descrição da tarefa', validators=[DataRequired(), Length(min=20, max=100,
                                                                                         message='A quantidade de '
                                                                                                 'caracteres deve ser '
-                                                                                                'maior que 0 e menor '
+                                                                                                'maior que 20 e menor '
                                                                                                 'que 100')])
     data = DateField('Data')
     submit = SubmitField('Alterar tarefa')

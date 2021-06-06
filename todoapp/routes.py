@@ -22,8 +22,8 @@ def cadastro():
         Usuario.create(nome=form.nome.data, email=form.email.data, senha=hash_senha)
         flash(f'Usuário {form.nome.data} foi criado com sucesso!', 'success')
         return redirect(url_for('login'))
-    else:
-        return render_template('cadastro.html', title='Cadastro', form=form)
+
+    return render_template('cadastro.html', title='Cadastro', form=form)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -63,7 +63,7 @@ def listas(id_lista):
     if not lista_ativa:
         lista_ativa = Lista.get_or_none(Lista.usuario == current_user.id)
         if lista_ativa:
-            return redirect(url_for('listas', id_lista=lista_ativa.id))
+            return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form)
 
     return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form)
 
@@ -84,9 +84,6 @@ def editar_lista(id_lista):
         return redirect(url_for('listas'))
     form = FormLista()
     if form.validate_on_submit():
-        if not lista:
-            flash('Esta lista não existe.')
-            return redirect(url_for('listas'))
         lista.nome = form.nome.data
         lista.descricao = form.descricao.data
         lista.save()
