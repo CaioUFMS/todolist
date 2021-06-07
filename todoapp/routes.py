@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash, redirect
+from flask import render_template, url_for, flash, redirect, request
 from todoapp.forms import FormCadastro, FormLogin, FormBuscaLista, FormLista, FormTarefa
 from flask_login import login_user, current_user, logout_user, login_required
 from todoapp.models import Usuario, Lista, Tarefa
@@ -158,6 +158,14 @@ def excluir_tarefa(id_lista, id_tarefa):
 def logout():
     logout_user()
     return redirect(url_for('sobre'))
+
+
+@app.route('/teste', methods=['GET', 'POST'])
+def teste():
+    if request.method == 'POST':
+        v = request.json
+        print(v)
+    return render_template('teste.html')
 
 
 if __name__ == '__main__':

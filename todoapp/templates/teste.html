@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+    <input type="checkbox" name="action" id="action" title="Teste">
+    <span>teste</span>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script>
+        $('#action').on('change',function(){
+            $.ajax({
+                type: 'POST',
+                url: '/teste',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({'data': $(this).is(':checked')}),
+                success: function(msg){
+                    alert('wow' + msg);
+                }
+            })
+        })
+    </script>
+
+{% endblock content %}
