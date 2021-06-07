@@ -46,11 +46,11 @@
                             </div>
                         </div>
                         <div class="d-flex">
-                            <a class="nav-link" href="{{ url_for('excluir_lista', id_lista=lista_ativa.id) }}">
-                                <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" alt="Excluir lista" width="20em" height="20em">
-                            </a>
                             <a class="nav-link" href="{{ url_for('editar_lista', id_lista=lista_ativa.id) }}">
                                 <img src="{{ url_for('static', filename='img/editIcon.png') }}" alt="Editar lista" width="20em" height="20em">
+                            </a>
+                            <a class="nav-link" href="{{ url_for('excluir_lista', id_lista=lista_ativa.id) }}">
+                                <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" alt="Excluir lista" width="20em" height="20em">
                             </a>
                             <a class="nav-link" href="{{ url_for('criar_tarefa', id_lista=lista_ativa.id) }}">
                                 <img src="{{ url_for('static', filename='img/addIcon.png') }}" alt="Criar tarefa" width="20em" height="20em">
@@ -65,22 +65,22 @@
                     </div>
                     <div class="row row-cols-auto g-4 mt-3">
                         {% for tarefa in lista_ativa.tarefas %}
-                            <div class="col">
+                            <div id="tarefa{{ tarefa.id }}" class="col">
                                 <div class="card border-dark mb-3" style="max-width: 18rem;">
                                     <div class="card-header justify-content-between d-flex" style="background-color: {{ tarefa.cor }};">
-                                            <div class="text-left">
-                                                {{ tarefa.titulo }}
+                                        <div class="text-left">
+                                            {{ tarefa.titulo }}
+                                        </div>
+                                        <div class="row text-right">
+                                            <div class="task-buttons">
+                                                <a href="{{ url_for('editar_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}">
+                                                    <img src="{{ url_for('static', filename='img/editIcon.png') }}" width="20em" height="20em" alt="Editar Tarefa">
+                                                </a>
+                                                <a style="cursor: pointer" id="excluir_tarefa{{ tarefa.id }}">
+                                                    <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" width="20em" height="20em" alt="Excluir tarefa">
+                                                </a>
                                             </div>
-                                            <div class="row text-right">
-                                                <div class="task-buttons">
-                                                    <a href="{{ url_for('editar_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}">
-                                                        <img src="{{ url_for('static', filename='img/editIcon.png') }}" width="20em" height="20em" alt="Editar Tarefa">
-                                                    </a>
-                                                    <a href="{{ url_for('excluir_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}">
-                                                        <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" width="20em" height="20em" alt="Excluir tarefa">
-                                                    </a>
-                                                </div>
-                                            </div>
+                                        </div>
                                     </div>
                                     <div class="card-body">
                                         <p class="card-text text-justify-CUSTOM">
@@ -93,7 +93,7 @@
                                                 Feito!
                                             </label>
                                             <input class="form-check-input" type="checkbox" name="exampleRadios"
-                                                   id="{{ "tarefa"+tarefa.id|string }}" value="option1" {% if tarefa.concluida %} checked {% endif %}>
+                                                   id="concluido_tarefa{{ tarefa.id }}" value="option1" {% if tarefa.concluida %} checked {% endif %}>
 
                                         </div>
                                     </div>
@@ -110,9 +110,8 @@
         let qtd_tarefas = {{ lista_ativa.tarefas|length }};
         let qtd_concluidas = {{ porcentagem_conclusao }};
         qtd_concluidas *= qtd_tarefas / 100;
-        console.log(qtd_tarefas)
         {% for tarefa in lista_ativa.tarefas %}
-            $('#tarefa' + {{ tarefa.id }}).on('change',function(){
+            $('#concluido_tarefa' + {{ tarefa.id }}).on('change', function(){
                 let checkedValue = $(this).is(':checked');
                 $.ajax({
                     type: 'PATCH',
@@ -131,34 +130,43 @@
                             qtd_concluidas += 1;
                         }
                         else {
-                            qtd_concluidas -= 1;
+                            qtd_concluidas = Math.round(qtd_concluidas) - 1;
                         }
                         progressbar.style.width = (qtd_concluidas * 100 / qtd_tarefas).toString() + '%';
                     }
                 })
             });
-            $('#tarefa' + {{ tarefa.id }}).on('change',function(){
-                let checkedValue = $(this).is(':checked');
+            $('#excluir_tarefa' + {{ tarefa.id }}).on('click', function(){
                 $.ajax({
-                    type: 'PATCH',
-                    url: '{{ url_for('listas') }}',
+                    type: 'DELETE',
+                    url: '{{ url_for('excluir_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}',
                     dataType: "json",
                     contentType: "application/json",
                     data: JSON.stringify(
                         {
-                            'id_tarefa': {{ tarefa.id }},
-                            'concluida': checkedValue
+                            'id_tarefa': {{ tarefa.id }}
                         }
                     ),
                     complete: function(){
                         let progressbar = document.getElementById("progresso");
+                        qtd_tarefas = Math.round(qtd_tarefas) - 1;
+                        let checkedValue = document.getElementById('concluido_tarefa{{ tarefa.id }}').checked;
+
                         if (checkedValue === true) {
-                            qtd_concluidas += 1;
+                            qtd_concluidas = Math.round(qtd_concluidas) - 1;
                         }
-                        else {
-                            qtd_concluidas -= 1;
+
+                        let porcentagem = 0;
+                        if (qtd_tarefas !== 0) {
+                            porcentagem = qtd_concluidas * 100 / qtd_tarefas
                         }
-                        progressbar.style.width = (qtd_concluidas * 100 / qtd_tarefas).toString() + '%';
+
+                        progressbar.style.width = porcentagem.toString() + '%';
+                        let tarefa = document.getElementById("tarefa{{ tarefa.id }}");
+                        tarefa.remove();
+                    },
+                    fail: function() {
+                        alert('adfdas');
                     }
                 })
             });

@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, abort, jsonify
 from todoapp.forms import FormCadastro, FormLogin, FormBuscaLista, FormLista, FormTarefa
 from flask_login import login_user, current_user, logout_user, login_required
 from todoapp.models import Usuario, Lista, Tarefa
@@ -150,19 +150,17 @@ def editar_tarefa(id_lista, id_tarefa):
     return render_template('editar_tarefa.html', tarefa=tarefa, form=form, id_lista=id_lista)
 
 
-@app.route('/listas/<int:id_lista>/tarefas/<int:id_tarefa>/excluir', methods=['GET', 'POST'])
+@app.route('/listas/<int:id_lista>/tarefas/<int:id_tarefa>/excluir', methods=['DELETE'])
 @login_required
 def excluir_tarefa(id_lista, id_tarefa):
     lista = Lista.get_or_none(Lista.id == id_lista)
     if not lista or lista.usuario.id != current_user.id:
-        flash('Lista não encontrada.', 'info')
-        return redirect(url_for('listas'))
+        return abort(404)
     tarefa = Tarefa.get_or_none(Tarefa.id == id_tarefa)
     if not tarefa:
-        flash('Tarefa não encontrada.', 'info')
-        return redirect(url_for('listas'))
+        return jsonify({'success': False})
     Tarefa.delete_by_id(id_tarefa)
-    return redirect(url_for('listas', id_lista=id_lista))
+    return jsonify({'success': True})
 
 
 @app.route('/logout')
@@ -177,6 +175,13 @@ def teste():
         v = request.json
         print(v)
     return render_template('teste.html')
+
+
+@app.errorhandler(404)
+def nao_encontrado(e):
+    return jsonify({
+        'message': 'Recurso não encontrado.'
+    })
 
 
 if __name__ == '__main__':

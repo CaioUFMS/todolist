@@ -128,7 +128,7 @@ label.color-picker>span>input[type=color] {
   /* Fill available horizontal space */
   border: none;
   /* Remove browser's border */
-  padding: 0px;
+  padding: 0;
   /* Remove space around color picker in Chrome */
 }
 
