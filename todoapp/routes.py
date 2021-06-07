@@ -41,10 +41,14 @@ def login():
     return render_template('login.html', title='Login', form=form)
 
 
-@app.route('/listas', defaults={'id_lista': None}, methods=['GET', 'POST'])
+@app.route('/listas', defaults={'id_lista': None}, methods=['GET', 'POST', 'PATCH'])
 @app.route('/listas/<int:id_lista>', methods=['GET', 'POST'])
 @login_required
 def listas(id_lista):
+    if request.method == 'PATCH':
+        data = request.json
+        Tarefa.update({Tarefa.concluida: data['concluida']}).where(Tarefa.id == data['id_tarefa']).execute()
+
     if id_lista:
         lista = Lista.get_or_none(Lista.id == id_lista)
         if not lista or lista.usuario.id != current_user.id:
@@ -63,9 +67,14 @@ def listas(id_lista):
     if not lista_ativa:
         lista_ativa = Lista.get_or_none(Lista.usuario == current_user.id)
         if lista_ativa:
-            return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form)
-
-    return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form)
+            return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form,
+                                   porcentagem_conclusao=lista_ativa.porcentagem_conclusao)
+        else:
+            return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form,
+                                   porcentagem_conclusao=None)
+    else:
+        return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form,
+                               porcentagem_conclusao=lista_ativa.porcentagem_conclusao)
 
 
 @app.route('/listas/criar_lista', methods=['GET', 'POST'])

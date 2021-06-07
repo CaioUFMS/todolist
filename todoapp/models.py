@@ -29,7 +29,7 @@ class Lista(BaseModel):
     usuario = ForeignKeyField(Usuario, backref='listas')
 
     @property
-    def conclusao(self):
+    def porcentagem_conclusao(self):
         tarefas = Tarefa.select().where(Tarefa.lista == self.id)
         concluidas, total = 0, 0
         for tarefa in tarefas:
@@ -37,7 +37,7 @@ class Lista(BaseModel):
                 concluidas += 1
             total += 1
 
-        return 0 if total == 0 else (concluidas // total) * 100
+        return 0 if total == 0 else (concluidas / total) * 100
 
 
 class Tarefa(BaseModel):

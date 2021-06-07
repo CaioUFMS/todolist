@@ -41,7 +41,7 @@
                         <div>
                             <h1>{{ lista_ativa.nome }}</h1>
                             <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 25%"
+                                <div id="progresso" class="progress-bar" role="progressbar" style="width: {{ porcentagem_conclusao }}%"
                                      aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
@@ -87,6 +87,16 @@
                                             {{ tarefa.descricao }}
                                         </p>
                                     </div>
+                                    <div class="card-footer bg-transparent">
+                                        <div class="form-check">
+                                            <label class="form-check-label" for="{{ "tarefa"+tarefa.id|string }}">
+                                                Feito!
+                                            </label>
+                                            <input class="form-check-input" type="checkbox" name="exampleRadios"
+                                                   id="{{ "tarefa"+tarefa.id|string }}" value="option1" {% if tarefa.concluida %} checked {% endif %}>
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
@@ -95,4 +105,63 @@
             {% endif %}
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script>
+        let qtd_tarefas = {{ lista_ativa.tarefas|length }};
+        let qtd_concluidas = {{ porcentagem_conclusao }};
+        qtd_concluidas *= qtd_tarefas / 100;
+        console.log(qtd_tarefas)
+        {% for tarefa in lista_ativa.tarefas %}
+            $('#tarefa' + {{ tarefa.id }}).on('change',function(){
+                let checkedValue = $(this).is(':checked');
+                $.ajax({
+                    type: 'PATCH',
+                    url: '{{ url_for('listas') }}',
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(
+                        {
+                            'id_tarefa': {{ tarefa.id }},
+                            'concluida': checkedValue
+                        }
+                    ),
+                    complete: function(){
+                        let progressbar = document.getElementById("progresso");
+                        if (checkedValue === true) {
+                            qtd_concluidas += 1;
+                        }
+                        else {
+                            qtd_concluidas -= 1;
+                        }
+                        progressbar.style.width = (qtd_concluidas * 100 / qtd_tarefas).toString() + '%';
+                    }
+                })
+            });
+            $('#tarefa' + {{ tarefa.id }}).on('change',function(){
+                let checkedValue = $(this).is(':checked');
+                $.ajax({
+                    type: 'PATCH',
+                    url: '{{ url_for('listas') }}',
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(
+                        {
+                            'id_tarefa': {{ tarefa.id }},
+                            'concluida': checkedValue
+                        }
+                    ),
+                    complete: function(){
+                        let progressbar = document.getElementById("progresso");
+                        if (checkedValue === true) {
+                            qtd_concluidas += 1;
+                        }
+                        else {
+                            qtd_concluidas -= 1;
+                        }
+                        progressbar.style.width = (qtd_concluidas * 100 / qtd_tarefas).toString() + '%';
+                    }
+                })
+            });
+        {% endfor %}
+    </script>
 {% endblock content %}
