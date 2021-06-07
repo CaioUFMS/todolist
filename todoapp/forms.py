@@ -35,12 +35,13 @@ class FormLista(FlaskForm):
 
 class FormTarefa(FlaskForm):
     titulo = StringField('Título da tarefa', validators=[DataRequired()])
-    descricao = TextAreaField('Descrição da tarefa', validators=[DataRequired(), Length(min=20, max=100,
+    descricao = TextAreaField('Descrição da tarefa', validators=[DataRequired(), Length(min=5, max=100,
                                                                                         message='A quantidade de '
                                                                                                 'caracteres deve ser '
-                                                                                                'maior que 20 e menor '
+                                                                                                'maior que 5 e menor '
                                                                                                 'que 100')])
     data = DateField('Data')
+    cor = StringField('')
     submit = SubmitField('Alterar tarefa')
 
 

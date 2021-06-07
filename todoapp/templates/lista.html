@@ -67,20 +67,20 @@
                         {% for tarefa in lista_ativa.tarefas %}
                             <div class="col">
                                 <div class="card border-dark mb-3" style="max-width: 18rem;">
-                                    <div class="card-header bg-transparent justify-content-between d-flex">
-                                        <div class="text-left">
-                                            {{ tarefa.titulo }}
-                                        </div>
-                                        <div class="row text-right">
-                                            <div class="task-buttons">
-                                                <a href="{{ url_for('editar_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}">
-                                                    <img src="{{ url_for('static', filename='img/editIcon.png') }}" width="20em" height="20em" alt="Editar Tarefa">
-                                                </a>
-                                                <a href="{{ url_for('excluir_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}">
-                                                    <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" width="20em" height="20em" alt="Excluir tarefa">
-                                                </a>
+                                    <div class="card-header justify-content-between d-flex" style="background-color: {{ tarefa.cor }};">
+                                            <div class="text-left">
+                                                {{ tarefa.titulo }}
                                             </div>
-                                        </div>
+                                            <div class="row text-right">
+                                                <div class="task-buttons">
+                                                    <a href="{{ url_for('editar_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}">
+                                                        <img src="{{ url_for('static', filename='img/editIcon.png') }}" width="20em" height="20em" alt="Editar Tarefa">
+                                                    </a>
+                                                    <a href="{{ url_for('excluir_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}">
+                                                        <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" width="20em" height="20em" alt="Excluir tarefa">
+                                                    </a>
+                                                </div>
+                                            </div>
                                     </div>
                                     <div class="card-body">
                                         <p class="card-text text-justify-CUSTOM">

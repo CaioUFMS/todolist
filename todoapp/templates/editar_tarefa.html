@@ -6,18 +6,46 @@
             <div class="col-4">
                 <form action="" method="POST">
                     {{ form.hidden_tag() }}
-                    <div>
-                        {{ form.titulo.label(class="form-control-label") }}
-                        {% if form.titulo.errors %}
-                            {{ form.titulo(class="form-control form-control-md is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.titulo.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
+                    <div class="row">
+                        <div class="col-2">
+                            {{ form.cor.label(class="form-control-label") }}
+                            <div class="dropstart">
+                                <button class="color-picker2" type="button" id="color-picker-button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: {{ tarefa.cor }};">
+                                    Cor
+                                </button>
+                                <ul id="color-picker" class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item" href="#" style="color:#61bd4f; background-color:#61bd4f;" value="green">Cor</a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="#" style="color:#f2d600; background-color:#f2d600" value="yellow">Cor</a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="#" style="color:#ff9f1a; background-color:#ff9f1a" value="orange">Cor</a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="#" style="color:#ffffff; background-color:#ffffff" value="white">Cor</a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="#" style="color:#eb5a46; background-color:#eb5a46" value="red">Cor</a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="#" style="color:#c377e0; background-color:#c377e0" value="purple">Cor</a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="#" style="color:#00c2e0; background-color:#00c2e0" value="blue">Cor</a>
+                                    </li>
+                                </ul>
+                                {{ form.cor(type="hidden", id="input-cor-tarefa") }}
                             </div>
-                        {% else %}
-                            {{ form.titulo(class="form-control mb-3 form-control-md", placeholder=tarefa.titulo) }}
-                        {% endif %}
+                        </div>
+                        <div class="col-10">
+                            {{ form.titulo.label(class="form-control-label") }}
+                            {% if form.titulo.errors %}
+                                {{ form.titulo(class="form-control form-control-md is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.titulo.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.titulo(class="form-control mb-3 form-control-md", value=tarefa.titulo) }}
+                            {% endif %}
+
+                        </div>
                     </div>
                     <div>
                         {{ form.descricao.label(class="form-control-label") }}
@@ -29,7 +57,7 @@
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form.descricao(class="form-control mb-3 form-control-md", placeholder=tarefa.descricao) }}
+                            {{ form.descricao(class="form-control mb-3 form-control-md") }}
                         {% endif %}
                     </div>
                     <div class="row">

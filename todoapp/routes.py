@@ -142,9 +142,11 @@ def editar_tarefa(id_lista, id_tarefa):
             return redirect(url_for('listas'))
         tarefa.titulo = form.titulo.data
         tarefa.descricao = form.descricao.data
+        tarefa.cor = form.cor.data
         tarefa.save()
         flash('Tarefa alterada com sucesso!', 'success')
         return redirect(url_for('listas', id_lista=id_lista))
+    form.descricao.data = tarefa.descricao
     return render_template('editar_tarefa.html', tarefa=tarefa, form=form, id_lista=id_lista)
 
 

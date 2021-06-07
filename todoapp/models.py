@@ -45,4 +45,5 @@ class Tarefa(BaseModel):
     titulo = CharField()
     descricao = TextField()
     concluida = BooleanField(default=False)
+    cor = CharField(default="rgb(255, 255, 255)")
     lista = ForeignKeyField(Lista, backref='tarefas')
