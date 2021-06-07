@@ -28,13 +28,21 @@ class Lista(BaseModel):
     descricao = TextField()
     usuario = ForeignKeyField(Usuario, backref='listas')
 
+    @property
+    def conclusao(self):
+        tarefas = Tarefa.select().where(Tarefa.lista == self.id)
+        concluidas, total = 0, 0
+        for tarefa in tarefas:
+            if tarefa.concluida:
+                concluidas += 1
+            total += 1
+
+        return 0 if total == 0 else (concluidas // total) * 100
+
 
 class Tarefa(BaseModel):
     id = AutoField()
     titulo = CharField()
     descricao = TextField()
+    concluida = BooleanField(default=False)
     lista = ForeignKeyField(Lista, backref='tarefas')
-
-
-if __name__ == '__main__':
-    db.create_tables([Usuario, Lista, Tarefa])
