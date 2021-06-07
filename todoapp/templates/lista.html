@@ -3,27 +3,9 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-3">
-                <form method="POST" action="">
-                    {{ form.hidden_tag() }}
-                    <div class="input-group mt-3 ps-3">
-                        {% if form.nome.errors %}
-                            {{ form.nome(class="form-control form-control-md is-invalid", placeholder='Buscar lista') }}
-                            <div>
-                                {{ form.submit(class="btn btn-primary ms-2") }}
-                            </div>
-                            <div class="invalid-feedback">
-                                {% for error in form.nome.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.nome(class="form-control mb-3 form-control-md", placeholder='Buscar lista') }}
-                            <div>
-                                {{ form.submit(class="btn btn-primary ms-2") }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </form>
+                <div class="input-group mt-3 ps-3">
+                    <input onkeyup="filterList()" id="busca" type="text" name="busca" class="form-control form-control-md" placeholder="Buscar">
+                </div>
                 <ul class="list-group-CUSTOM">
                     <li class="create-list">
                         <a href="{{ url_for('criar_lista') }}"> + Criar lista</a>
@@ -63,7 +45,7 @@
                             {{ lista_ativa.descricao }}
                         </p>
                     </div>
-                    <div class="row row-cols-auto g-4 mt-3">
+                    <div id="tarefas" class="row row-cols-auto g-4 mt-3">
                         {% for tarefa in lista_ativa.tarefas %}
                             <div id="tarefa{{ tarefa.id }}" class="col">
                                 <div class="card border-dark mb-3" style="max-width: 18rem;">
@@ -107,6 +89,64 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script>
+        function filterList() {
+            let input = document.getElementById('busca');
+            let filter = input.value.toUpperCase();
+            if (filter.startsWith(':')) {
+                filter = filter.substring(1, filter.length)
+                let tarefas, tarefa, titulo;
+                tarefas = document.getElementById("tarefas").getElementsByClassName("col");
+                for (let i = 0; i < tarefas.length; i++) {
+                    tarefa = tarefas[i];
+                    titulo = tarefa.getElementsByClassName("text-left")[0].textContent;
+
+                    let filters = filter.split(" ");
+                    filters = filters.filter(f => f.length)
+
+                    let shouldDisplay = true
+                    filters.forEach(filt => {
+                        shouldDisplay = shouldDisplay && titulo.toUpperCase().includes(filt)
+                    })
+
+                    tarefas[i].style.display = (shouldDisplay || filters.length === 0) ? "" : "none";
+                }
+            }
+            else {
+                let ul, li, a, i, txtValue;
+                ul = document.getElementsByClassName("list-group-CUSTOM")[0];
+                li = ul.getElementsByClassName("list-group-item-CUSTOM");
+
+                for (i = 0; i < li.length; i++) {
+                    a = li[i];
+                    txtValue = a.textContent || a.innerText;
+
+                    // split filter by spaces, gives ["app", "MN"] in your example
+                    let filters = filter.split(" ")
+
+                    // remove the empty filters (if your filter string
+                    // starts or ends by a space) since they are source of errors
+
+                    // Array.filter takes in parameter a function returning a boolean
+                    // it create a new array containing only element where
+                    // the function returned truthy value
+
+                    // here we return the length of the string which is falsy (== 0) for ""
+                    // and truthy for every other string (!= 0)
+                    filters = filters.filter(f => f.length)
+
+                    let shouldDisplay = true
+                    // test each filter and store true only if string contains all filter
+                    filters.forEach(filt => {
+                        shouldDisplay = shouldDisplay && txtValue.toUpperCase().includes(filt)
+                    })
+
+                    // update visibility
+                    // set visible if the string include all filters
+                    // or if there is no filter
+                    li[i].style.display = (shouldDisplay || filters.length === 0) ? "" : "none";
+                }
+            }
+        }
         let qtd_tarefas = {{ lista_ativa.tarefas|length }};
         let qtd_concluidas = {{ porcentagem_conclusao }};
         qtd_concluidas *= qtd_tarefas / 100;

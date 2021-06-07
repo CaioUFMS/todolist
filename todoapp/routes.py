@@ -142,7 +142,10 @@ def editar_tarefa(id_lista, id_tarefa):
             return redirect(url_for('listas'))
         tarefa.titulo = form.titulo.data
         tarefa.descricao = form.descricao.data
-        tarefa.cor = form.cor.data
+        if form.cor.data:
+            tarefa.cor = form.cor.data
+        else:
+            tarefa.cor = 'rgb(255, 255, 255)'
         tarefa.save()
         flash('Tarefa alterada com sucesso!', 'success')
         return redirect(url_for('listas', id_lista=id_lista))
