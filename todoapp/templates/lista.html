@@ -52,7 +52,7 @@
                             <a class="nav-link" href="{{ url_for('excluir_lista', id_lista=lista_ativa.id) }}">
                                 <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" alt="Excluir lista" width="20em" height="20em">
                             </a>
-                            <a class="nav-link" href="{{ url_for('criar_tarefa', id_lista=lista_ativa.id) }}">
+                            <a href="{{ url_for('criar_tarefa', id_lista=lista_ativa.id) }}" class="nav-link">
                                 <img src="{{ url_for('static', filename='img/addIcon.png') }}" alt="Criar tarefa" width="20em" height="20em">
                             </a>
                         </div>
@@ -140,13 +140,6 @@
                 $.ajax({
                     type: 'DELETE',
                     url: '{{ url_for('excluir_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}',
-                    dataType: "json",
-                    contentType: "application/json",
-                    data: JSON.stringify(
-                        {
-                            'id_tarefa': {{ tarefa.id }}
-                        }
-                    ),
                     complete: function(){
                         let progressbar = document.getElementById("progresso");
                         qtd_tarefas = Math.round(qtd_tarefas) - 1;
@@ -164,9 +157,6 @@
                         progressbar.style.width = porcentagem.toString() + '%';
                         let tarefa = document.getElementById("tarefa{{ tarefa.id }}");
                         tarefa.remove();
-                    },
-                    fail: function() {
-                        alert('adfdas');
                     }
                 })
             });

@@ -121,7 +121,7 @@ def criar_tarefa(id_lista):
         flash('Lista não encontrada.', 'info')
         return redirect(url_for('listas'))
     tarefa = Tarefa.create(titulo='Tarefa', descricao='Descrição da tarefa.', lista=id_lista)
-    return redirect(url_for('listas', id_lista=id_lista))
+    return redirect(url_for('editar_tarefa', id_lista=id_lista, id_tarefa=tarefa.id))
 
 
 @app.route('/listas/<int:id_lista>/tarefas/<int:id_tarefa>/editar', methods=['GET', 'POST'])
@@ -158,7 +158,7 @@ def excluir_tarefa(id_lista, id_tarefa):
         return abort(404)
     tarefa = Tarefa.get_or_none(Tarefa.id == id_tarefa)
     if not tarefa:
-        return jsonify({'success': False})
+        return abort(404)
     Tarefa.delete_by_id(id_tarefa)
     return jsonify({'success': True})
 
