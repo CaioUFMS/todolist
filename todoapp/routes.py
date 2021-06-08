@@ -153,15 +153,16 @@ def editar_tarefa(id_lista, id_tarefa):
     return render_template('editar_tarefa.html', tarefa=tarefa, form=form, id_lista=id_lista)
 
 
-@app.route('/listas/<int:id_lista>/tarefas/<int:id_tarefa>/excluir', methods=['DELETE'])
+@app.route('/tarefas/<int:id_tarefa>/excluir', methods=['DELETE'])
 @login_required
-def excluir_tarefa(id_lista, id_tarefa):
-    lista = Lista.get_or_none(Lista.id == id_lista)
-    if not lista or lista.usuario.id != current_user.id:
-        return abort(404)
+def excluir_tarefa(id_tarefa):
     tarefa = Tarefa.get_or_none(Tarefa.id == id_tarefa)
     if not tarefa:
         return abort(404)
+    lista = Lista.get_or_none(Lista.id == tarefa.lista)
+    if not lista or lista.usuario.id != current_user.id:
+        return abort(404)
+
     Tarefa.delete_by_id(id_tarefa)
     return jsonify({'success': True})
 
@@ -172,12 +173,14 @@ def logout():
     return redirect(url_for('sobre'))
 
 
-@app.route('/teste', methods=['GET', 'POST'])
-def teste():
-    if request.method == 'POST':
-        v = request.json
-        print(v)
-    return render_template('teste.html')
+@app.route('/teste/<int:id_lista>/tarefas/criar_tarefa', methods=['POST'])
+@login_required
+def teste(id_lista):
+    lista = Lista.get_or_none(Lista.id == id_lista)
+    if not lista or lista.usuario.id != current_user.id:
+        return abort(404)
+    tarefa = Tarefa.create(titulo='Tarefa', descricao='Descrição da tarefa.', lista=id_lista)
+    return jsonify(tarefa.as_dict())
 
 
 @app.errorhandler(404)

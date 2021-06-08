@@ -1,4 +1,5 @@
 from peewee import *
+from playhouse.shortcuts import model_to_dict
 from todoapp import login_manager
 from flask_login import UserMixin
 
@@ -13,6 +14,9 @@ def load_user(id_usuario):
 class BaseModel(Model):
     class Meta:
         database = db
+
+    def as_dict(self):
+        return model_to_dict(self, recurse=False)
 
 
 class Usuario(BaseModel, UserMixin):

@@ -29,6 +29,7 @@
 
 .list-group-CUSTOM a{
   text-decoration: none;
+  color: inherit;
 }
 
 .minha-classe {
@@ -36,7 +37,7 @@
   text-decoration: none !important;
 }
 
-.list-group-item-CUSTOM:hover{
+.list-group-item-CUSTOM :hover{
   background-color: #aaaaaa;
 }
 
@@ -207,11 +208,12 @@ label.color-picker>span>input[type=color]::-moz-focus-inner {
 }
 */
 
-.list-group-item-CUSTOM {
+.list-group-item-CUSTOM a {
   padding: 0.5rem 2rem;
   border-radius: 2px;
   color: #212529;
   font-weight: bold;
+
 }
 
 .create-list {
