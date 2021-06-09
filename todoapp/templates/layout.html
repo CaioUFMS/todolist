@@ -16,7 +16,7 @@
 <nav class="navbar navbar-expand navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url_for('sobre') }}">
-            <img src="{{ url_for('static', filename='img/ToDoLogo.png') }}" class="logo">
+            <img alt="logo" src="{{ url_for('static', filename='img/ToDoLogo.png') }}" class="logo">
         </a>
         <div class="navbar-nav">
             {% if current_user.is_authenticated %}
