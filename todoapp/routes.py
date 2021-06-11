@@ -1,13 +1,15 @@
-from flask import render_template, url_for, flash, redirect, request, abort, jsonify
-from todoapp.forms import FormCadastro, FormLogin, FormBuscaLista, FormLista, FormTarefa
+from flask import render_template, url_for, flash, redirect, request, jsonify
+from peewee import JOIN
+
+from todoapp.forms import FormCadastro, FormLogin, FormLista, FormTarefa
 from flask_login import login_user, current_user, logout_user, login_required
-from todoapp.models import Usuario, Lista, Tarefa
+from todoapp.models import Usuario, Lista, Tarefa, DoesNotExist
 from todoapp import app, bcrypt
+from playhouse.shortcuts import model_to_dict
 
 
 @app.route('/')
 @app.route('/home')
-@app.route('/sobre')
 def sobre():
     return render_template('sobre.html', title='Sobre')
 
@@ -41,47 +43,16 @@ def login():
     return render_template('login.html', title='Login', form=form)
 
 
-@app.route('/listas', defaults={'id_lista': None}, methods=['GET', 'POST', 'PATCH'])
-@app.route('/listas/<int:id_lista>', methods=['GET', 'POST'])
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('sobre'))
+
+
+@app.route('/listas')
 @login_required
-def listas(id_lista):
-    if request.method == 'PATCH':
-        data = request.json
-        Tarefa.update({Tarefa.concluida: data['concluida']}).where(Tarefa.id == data['id_tarefa']).execute()
-
-    if id_lista:
-        lista = Lista.get_or_none(Lista.id == id_lista)
-        if not lista or lista.usuario.id != current_user.id:
-            flash('Lista não encontrada.', 'info')
-            return redirect(url_for('listas'))
-
-    form = FormBuscaLista()
-    if form.validate_on_submit():
-        if form.nome.data != '':
-            listas = Lista.select().where((Lista.nome.startswith(form.nome.data)) & (Lista.usuario == current_user.id))
-        else:
-            listas = Lista.select().where(Lista.usuario == current_user.id)
-    else:
-        listas = Lista.select().where(Lista.usuario == current_user.id)
-    lista_ativa = Lista.get_or_none(Lista.id == id_lista)
-    if not lista_ativa:
-        lista_ativa = Lista.get_or_none(Lista.usuario == current_user.id)
-        if lista_ativa:
-            return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form,
-                                   porcentagem_conclusao=lista_ativa.porcentagem_conclusao)
-        else:
-            return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form,
-                                   porcentagem_conclusao=None)
-    else:
-        return render_template('lista.html', title='Listas', listas=listas, lista_ativa=lista_ativa, form=form,
-                               porcentagem_conclusao=lista_ativa.porcentagem_conclusao)
-
-
-@app.route('/listas/criar_lista', methods=['GET', 'POST'])
-@login_required
-def criar_lista():
-    lista = Lista.create(nome='Lista de tarefas', descricao='Descrição da lista de tarefas.', usuario=current_user.id)
-    return redirect(url_for('listas', id_lista=lista.id))
+def listas():
+    return render_template('lista.html', title='Listas')
 
 
 @app.route('/listas/<int:id_lista>/editar', methods=['GET', 'POST'])
@@ -99,29 +70,6 @@ def editar_lista(id_lista):
         flash('Lista alterada com sucesso!', 'success')
         return redirect(url_for('listas', id_lista=lista.id))
     return render_template('editar_lista.html', lista=lista, form=form)
-
-
-@app.route('/listas/<int:id_lista>/excluir', methods=['GET', 'POST'])
-@login_required
-def excluir_lista(id_lista):
-    lista = Lista.get_or_none(Lista.id == id_lista)
-    if not lista or lista.usuario.id != current_user.id:
-        flash('Lista não encontrada.', 'info')
-        return redirect(url_for('listas'))
-    Tarefa.delete().where(Tarefa.lista == id_lista).execute()
-    Lista.delete_by_id(id_lista)
-    return redirect(url_for('listas'))
-
-
-@app.route('/listas/<int:id_lista>/tarefas/criar_tarefa', methods=['GET', 'POST'])
-@login_required
-def criar_tarefa(id_lista):
-    lista = Lista.get_or_none(Lista.id == id_lista)
-    if not lista or lista.usuario.id != current_user.id:
-        flash('Lista não encontrada.', 'info')
-        return redirect(url_for('listas'))
-    tarefa = Tarefa.create(titulo='Tarefa', descricao='Descrição da tarefa.', lista=id_lista)
-    return redirect(url_for('editar_tarefa', id_lista=id_lista, id_tarefa=tarefa.id))
 
 
 @app.route('/listas/<int:id_lista>/tarefas/<int:id_tarefa>/editar', methods=['GET', 'POST'])
@@ -153,42 +101,107 @@ def editar_tarefa(id_lista, id_tarefa):
     return render_template('editar_tarefa.html', tarefa=tarefa, form=form, id_lista=id_lista)
 
 
-@app.route('/tarefas/<int:id_tarefa>/excluir', methods=['DELETE'])
+# API
+@app.route('/api/listas', defaults={'id_lista': None}, methods=['GET', 'POST'])
+@app.route('/api/listas/<int:id_lista>', methods=['GET', 'PATCH', 'DELETE'])
 @login_required
-def excluir_tarefa(id_tarefa):
-    tarefa = Tarefa.get_or_none(Tarefa.id == id_tarefa)
-    if not tarefa:
-        return abort(404)
-    lista = Lista.get_or_none(Lista.id == tarefa.lista)
-    if not lista or lista.usuario.id != current_user.id:
-        return abort(404)
+def api_listas(id_lista):
+    if request.method == 'GET':
+        if id_lista:
+            try:
+                lista = Lista.select(Lista, Tarefa).join(Tarefa, JOIN.LEFT_OUTER).where(Lista.id == id_lista).get()
+            except DoesNotExist:
+                lista = None
 
-    Tarefa.delete_by_id(id_tarefa)
-    return jsonify({'success': True})
+            if not lista or lista.usuario.id != current_user.id:
+                return jsonify({'msg': 'Recurso não encontrado'})
+
+            model = model_to_dict(lista, recurse=False)
+            model.update({'tarefas': [model_to_dict(tarefa, recurse=False) for tarefa in lista.tarefas]})
+            return jsonify(model)
+
+        listas = Lista.select(Lista.id, Lista.nome).where(Lista.usuario == current_user.id)
+        listas = [model_to_dict(lista, recurse=False, fields_from_query=listas) for lista in listas]
+        return jsonify(listas)
+
+    elif request.method == 'POST':
+        lista = Lista.create(nome='Lista de tarefas', descricao='Descrição da lista de tarefas.',
+                             usuario=current_user.id)
+        return jsonify(model_to_dict(lista, recurse=False))
+
+    elif request.method == 'PATCH':
+        if id_lista:
+            lista = Lista.get_or_none(Lista.id == id_lista)
+            if not lista or lista.usuario.id != current_user.id:
+                return jsonify({'msg': 'Recurso não encontrado'})
+
+            data = request.json
+            lista.nome = data['nome']
+            lista.descricao = data['descricao']
+            lista.save()
+            return jsonify(model_to_dict(lista, recurse=False))
+
+        return jsonify({'msg': 'Forneça o id da lista'})
+
+    elif request.method == 'DELETE':
+        if id_lista:
+            lista = Lista.get_or_none(Lista.id == id_lista)
+            if not lista or lista.usuario.id != current_user.id:
+                return jsonify({'msg': 'Recurso não encontrado'})
+
+            Tarefa.delete().where(Tarefa.lista == id_lista)
+            lista.delete_instance()
+            return jsonify({'msg': 'Recurso excluído com sucesso'})
+
+        return jsonify({'msg': 'Forneça o id da lista'})
 
 
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('sobre'))
-
-
-@app.route('/teste/<int:id_lista>/tarefas/criar_tarefa', methods=['POST'])
+@app.route('/api/listas/<int:id_lista>/tarefas', defaults={'id_tarefa': None}, methods=['POST'])
+@app.route('/api/listas/<int:id_lista>/tarefas/<int:id_tarefa>', methods=['GET', 'PATCH', 'DELETE'])
 @login_required
-def teste(id_lista):
-    lista = Lista.get_or_none(Lista.id == id_lista)
-    if not lista or lista.usuario.id != current_user.id:
-        return abort(404)
-    tarefa = Tarefa.create(titulo='Tarefa', descricao='Descrição da tarefa.', lista=id_lista)
-    return jsonify(tarefa.as_dict())
+def api_tarefas(id_lista, id_tarefa):
+    if request.method == 'GET':
+        if not id_tarefa:
+            return jsonify({'msg': 'Forneça o id da tarefa'})
 
+        tarefa = Tarefa.get_or_none(Tarefa.id == id_tarefa)
+        if not tarefa or tarefa.lista.usuario.id != current_user.id:
+            return jsonify({'msg': 'Recurso não encontrado'})
 
-@app.errorhandler(404)
-def nao_encontrado(e):
-    return jsonify({
-        'message': 'Recurso não encontrado.'
-    })
+        return jsonify(model_to_dict(tarefa, recurse=False))
 
+    elif request.method == 'POST':
+        data = request.json
+        tarefa = Tarefa.create(titulo='Tarefa', descricao='Descrição da tarefa.', lista=id_lista)
+        return jsonify(model_to_dict(tarefa, recurse=False))
 
-if __name__ == '__main__':
-    app.run()
+    elif request.method == 'PATCH':
+        if not id_tarefa:
+            return jsonify({'msg': 'Forneça o id da tarefa'})
+
+        data = request.json
+        tarefa = Tarefa.get_or_none(Tarefa.id == id_tarefa)
+        if not tarefa or tarefa.lista.usuario.id != current_user.id:
+            return jsonify({'msg': 'Recurso não encontrado'})
+
+        if 'concluida' in data:
+            tarefa.concluida = data['concluida']
+
+        else:
+            tarefa.titulo = data['titulo']
+            tarefa.descricao = data['descricao']
+            tarefa.cor = data['cor']
+        tarefa.save()
+
+        return jsonify(model_to_dict(tarefa, recurse=False))
+
+    elif request.method == 'DELETE':
+        if not id_tarefa:
+            return jsonify({'msg': 'Forneça o id da tarefa'})
+
+        tarefa = Tarefa.get_or_none(Tarefa.id == id_tarefa)
+        if not tarefa or tarefa.lista.usuario.id != current_user.id:
+            return jsonify({'msg': 'Recurso não encontrado'})
+
+        tarefa.delete_instance()
+        return jsonify({'msg': 'Recurso excluído com sucesso'})

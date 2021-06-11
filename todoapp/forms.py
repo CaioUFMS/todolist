@@ -43,8 +43,3 @@ class FormTarefa(FlaskForm):
     data = DateField('Data')
     cor = StringField('')
     submit = SubmitField('Alterar tarefa')
-
-
-class FormBuscaLista(FlaskForm):
-    nome = StringField('Nome da lista')
-    submit = SubmitField('Buscar')

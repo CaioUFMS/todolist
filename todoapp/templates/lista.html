@@ -1,125 +1,165 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="container-fluid">
+    <div class="mt-2 container-fluid">
         <div class="row">
             <div class="col-3">
-                <div class="input-group mt-3 ps-3">
+                <div class="input-group mt-3">
                     <input title="Para buscar tarefas, adicione ':' como primeiro caractere" onkeyup="filterList()" id="busca" type="text" name="busca" class="form-control form-control-md" placeholder="Buscar">
                 </div>
-                <ul class="list-group-CUSTOM">
-                    <li class="create-list">
-                        <a href="{{ url_for('criar_lista') }}"> + Criar lista</a>
-                    </li>
-                    {% for lista in listas %}
-                        <a href="{{ url_for('listas', id_lista=lista.id) }}">
-                            <li class="list-group-item-CUSTOM">{{ lista.nome }}</li>
-                        </a>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% if lista_ativa %}
-                <div class="col-9 card-group-CUSTOM">
-                    <div class="justify-content-between d-flex mt-2">
-                        <div>
-                            <h1>{{ lista_ativa.nome }}</h1>
-                            <div class="progress">
-                                <div id="progresso" class="progress-bar" role="progressbar" style="width: {{ porcentagem_conclusao }}%"
-                                     aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div class="d-flex">
-                            <a class="nav-link" href="{{ url_for('editar_lista', id_lista=lista_ativa.id) }}">
-                                <img src="{{ url_for('static', filename='img/editIcon.png') }}" alt="Editar lista" width="20em" height="20em">
-                            </a>
-                            <a class="nav-link" href="{{ url_for('excluir_lista', id_lista=lista_ativa.id) }}">
-                                <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" alt="Excluir lista" width="20em" height="20em">
-                            </a>
-                            <a style="cursor: pointer" id="criar_tarefa" class="nav-link">
-                                <img src="{{ url_for('static', filename='img/addIcon.png') }}" alt="Criar tarefa" width="20em" height="20em">
-                            </a>
-                        </div>
-                    </div>
+                <div class="mt-3 ms-1">
+                    <a id="criar_lista" style="cursor: pointer" class="text-decoration-none">+ Criar lista</a>
+                    <div id="listas" class="mt-2 list-group overflow-auto" style="height: 79vh">
 
-                    <div class="mt-4 w-90">
-                        <p class="text-justify-CUSTOM">
-                            {{ lista_ativa.descricao }}
-                        </p>
-                    </div>
-                    <div id="tarefas" class="row row-cols-auto g-4 mt-3">
-                        {% for tarefa in lista_ativa.tarefas %}
-                            <div id="tarefa{{ tarefa.id }}" class="col">
-                                <div class="card border-dark mb-3" style="max-width: 18rem;">
-                                    <div class="card-header justify-content-between d-flex" style="background-color: {{ tarefa.cor }};">
-                                        <div class="text-left">
-                                            {{ tarefa.titulo }}
-                                        </div>
-                                        <div class="row text-right">
-                                            <div class="task-buttons">
-                                                <a href="{{ url_for('editar_tarefa', id_lista=lista_ativa.id, id_tarefa=tarefa.id) }}">
-                                                    <img src="{{ url_for('static', filename='img/editIcon.png') }}" width="20em" height="20em" alt="Editar Tarefa">
-                                                </a>
-                                                <a class="excluir-tarefa" style="cursor: pointer" id="excluir_tarefa{{ tarefa.id }}">
-                                                    <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" width="20em" height="20em" alt="Excluir tarefa">
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="card-text text-justify-CUSTOM">
-                                            {{ tarefa.descricao }}
-                                        </p>
-                                    </div>
-                                    <div class="card-footer bg-transparent">
-                                        <div class="form-check">
-                                            <label class="form-check-label" for="concluido_tarefa{{ tarefa.id }}">
-                                                Feito!
-                                            </label>
-                                            <input class="form-check-input" type="checkbox" name="exampleRadios"
-                                                   id="concluido_tarefa{{ tarefa.id }}" value="option1" {% if tarefa.concluida %} checked {% endif %}>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
                     </div>
                 </div>
-            {% endif %}
+
+            </div>
+            <div class="col-9 card-group-CUSTOM">
+                <div class="justify-content-between d-flex mt-2">
+                    <div>
+                        <h1 id="nome_lista">
+                            Selecione ou crie uma lista!
+                        </h1>
+                        <div class="invisible progress">
+                            <div id="progresso" class="progress-bar" role="progressbar" style="width: 0"
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div id="botoes_lista" class="invisible d-flex">
+                        <a id="editar_lista" class="nav-link" style="cursor: pointer">
+                            <img src="{{ url_for('static', filename='img/editIcon.png') }}" alt="Editar lista" width="20em" height="20em">
+                        </a>
+                        <a id="excluir_lista" class="nav-link" style="cursor: pointer">
+                            <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" alt="Excluir lista" width="20em" height="20em">
+                        </a>
+                        <a style="cursor: pointer" id="criar_tarefa" class="nav-link">
+                            <img src="{{ url_for('static', filename='img/addIcon.png') }}" alt="Criar tarefa" width="20em" height="20em">
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-4 w-90">
+                    <p id="descricao_lista" class="text-justify-CUSTOM">
+
+                    </p>
+                </div>
+                <div id="tarefas" class="row row-cols-auto g-4 mt-3">
+
+                </div>
+            </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script>
-        {% if lista_ativa %}
-            $('#criar_tarefa').on('click', function(){
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ url_for('teste', id_lista=lista_ativa.id) }}',
-                    complete: function(msg, status, jqXHR){
-                        criar_tarefa(msg.responseJSON)
-                        let progressbar = document.getElementById("progresso");
-                        qtd_tarefas = Math.round(qtd_tarefas) + 1;
-                        let porcentagem = qtd_concluidas * 100 / qtd_tarefas;
-                        progressbar.style.width = porcentagem.toString() + '%';
+        function recuperaListas() {
+            $.ajax({
+                type: 'GET',
+                url: '/api/listas',
+                complete: function(response){
+                    let json = response.responseJSON;
+                    for (let i = 0; i < json.length; i++) {
+                        let nova_lista = document.createElement('button');
+                        nova_lista.id = "lista_" + json[i]['id']
+                        nova_lista.className= 'list-group-item list-group-item-action';
+                        if (i === 0) {
+                            nova_lista.className= 'list-group-item list-group-item-action active';
+                        }
+                        nova_lista.innerText = json[i]['nome'];
+                        nova_lista.style.border = 'none';
+                        document.getElementById("listas").append(nova_lista);
+                        if (i === 0) {
+                            nova_lista.click();
+                        }
                     }
-                })
-            });
-            function criar_tarefa(tarefa) {
-                let tarefas = document.getElementById('tarefas');
-                let edit_url_for = '{{ url_for('editar_tarefa', id_lista=lista_ativa.id, id_tarefa=-1) }}';
-                edit_url_for = edit_url_for.replace('-1', tarefa.id);
-                let html_tarefa = `
-                <div id="tarefa${tarefa.id}" class="col">
+                }
+            })
+
+
+        }
+        recuperaListas();
+
+
+        function criar_lista(msg) {
+            let json = msg.responseJSON
+            let listas = document.getElementById("listas");
+            let nova_lista = document.createElement('button');
+            nova_lista.className= 'list-group-item list-group-item-action';
+            nova_lista.innerText = json["nome"];
+            nova_lista.style.border = 'none';
+            nova_lista.id = 'lista_' + json['id'];
+            listas.append(nova_lista);
+            nova_lista.click();
+        }
+
+        $('#criar_lista').on('click', function(){
+            $.ajax({
+                type: 'POST',
+                url: '/api/listas',
+                complete: function(msg){
+                    criar_lista(msg);
+                }
+            })
+        });
+
+        function excluirLista(id_lista) {
+            $.ajax({
+                type: 'DELETE',
+                url: '/api/listas/' + id_lista,
+                complete: function(){
+                    let lista = document.getElementById('lista_' + id_lista);
+                    lista.remove();
+                    let ul = document.getElementById("listas");
+                    let li = ul.getElementsByClassName("list-group-item");
+                    if (li.length > 0) {
+                        li[0].click();
+                    }
+                    else {
+                        document.getElementById('nome_lista').innerText = 'Selecione ou crie uma lista!';
+                        document.getElementById('descricao_lista').innerText = '';
+                        document.getElementById('botoes_lista').classList.add('invisible');
+                        document.getElementsByClassName('progress')[0].classList.add('invisible');
+                    }
+                }
+            })
+        }
+
+        function criarTarefa(id_lista) {
+            $.ajax({
+                type: 'POST',
+                url: '/api/listas/' + id_lista + '/tarefas',
+                complete: function(msg){
+                    desenharTarefa(msg.responseJSON)
+                    let progressbar = document.getElementById("progresso");
+                    let qtd_tarefas = parseInt(localStorage.getItem('qtd_tarefas'), 10) + 1;
+                    let qtd_concluidas = parseInt(localStorage.getItem('qtd_concluidas'), 10);
+
+                    localStorage.setItem('qtd_tarefas', `${qtd_tarefas}`);
+                    let porcentagem = qtd_concluidas * 100 / qtd_tarefas;
+                    progressbar.style.width = porcentagem.toString() + '%';
+                }
+            })
+        }
+
+        function desenharTarefa(tarefa) {
+            let tarefas = document.getElementById('tarefas');
+            let url_editar_tarefa = `/listas/${tarefa['lista']}/tarefas/${tarefa['id']}/editar`;
+            let concluida = '';
+            if (tarefa['concluida'] === true) {
+                concluida = 'checked';
+            }
+            let html_tarefa = `
+                <div id="${tarefa['lista']}_tarefa_${tarefa['id']}" class="col">
                     <div class="card border-dark mb-3" style="max-width: 18rem;">
-                        <div class="card-header justify-content-between d-flex" style="background-color: ${tarefa.cor};">
+                        <div class="card-header justify-content-between d-flex" style="background-color: ${tarefa['cor']};">
                             <div class="text-left">
-                                ${tarefa.titulo}
+                                ${tarefa["titulo"]}
                             </div>
                             <div class="row text-right">
                                 <div class="task-buttons">
-                                    <a href="${edit_url_for}">
+                                    <a class="editar-tarefa" href="${url_editar_tarefa}">
                                         <img src="{{ url_for('static', filename='img/editIcon.png') }}" width="20em" height="20em" alt="Editar Tarefa">
                                     </a>
-                                    <a class="excluir-tarefa" style="cursor: pointer" id="excluir_tarefa${tarefa.id}">
+                                    <a class="excluir-tarefa" style="cursor: pointer">
                                         <img src="{{ url_for('static', filename='img/deleteIcon.png') }}" width="20em" height="20em" alt="Excluir tarefa">
                                     </a>
                                 </div>
@@ -127,25 +167,131 @@
                         </div>
                         <div class="card-body">
                             <p class="card-text text-justify-CUSTOM">
-                                ${tarefa.descricao}
+                                ${tarefa['descricao']}
                             </p>
                         </div>
                         <div class="card-footer bg-transparent">
                             <div class="form-check">
-                                <label class="form-check-label" for="concluido_tarefa${tarefa.id}">
+                                <label class="form-check-label" for="concluido_tarefa${tarefa['id']}">
                                     Feito!
                                 </label>
                                 <input class="form-check-input" type="checkbox" name="exampleRadios"
-                                       id="concluido_tarefa${tarefa.id}" value="option1">
+                                       id="concluido_tarefa${tarefa['id']}" value="option1" ${concluida}>
 
                             </div>
                         </div>
                     </div>
                 </div>
             `
-                tarefas.innerHTML += html_tarefa;
-            }
-        {% endif %}
+            tarefas.innerHTML += html_tarefa;
+        }
+
+        $('#listas').on('click', 'button', function() {
+            $(this).addClass('active').siblings().removeClass('active');
+            let id_lista = $(this).attr('id').split('_')[1];
+            $.ajax({
+                type: 'GET',
+                url: '/api/listas/' + id_lista,
+                complete: function(msg){
+                    document.getElementById('nome_lista').innerText = msg.responseJSON['nome'];
+                    document.getElementById('descricao_lista').innerText = msg.responseJSON['descricao'];
+                    document.getElementById('botoes_lista').classList.remove('invisible');
+                    document.getElementById('editar_lista').setAttribute('href', `/listas/${id_lista}/editar`)
+                    document.getElementsByClassName('progress')[0].classList.remove('invisible');
+                    $('#botoes_lista').off()
+                        .on('click', '#excluir_lista', function() {excluirLista(id_lista)})
+                        .on('click', '#criar_tarefa', function() {criarTarefa(id_lista)});
+                    $('#tarefas').empty();
+                    let lista = msg.responseJSON;
+                    let tarefas = lista['tarefas'];
+                    let qtd_concluidas = 0;
+                    let qtd_tarefas = 0;
+                    if (tarefas) {
+                        for (let i = 0; i < tarefas.length; i++) {
+                            desenharTarefa(tarefas[i]);
+                            if (tarefas[i]['concluida'] === true) {
+                                qtd_concluidas++;
+                            }
+                            qtd_tarefas++;
+                        }
+                    }
+                    let porcentagem = '0%'
+                    if (qtd_tarefas !== 0) {
+                        porcentagem = `${qtd_concluidas*100 / qtd_tarefas}%`
+                    }
+                    document.getElementById('progresso').style.width = porcentagem;
+                    localStorage.setItem('qtd_tarefas', `${qtd_tarefas}`);
+                    localStorage.setItem('qtd_concluidas', `${qtd_concluidas}`);
+                }
+            })
+        })
+
+        $('#tarefas')
+            .on('click', 'input', function(){
+                let ids = $(this).parent().parent().parent().parent().attr('id').split('_');
+                let id_lista = ids[0];
+                let id_tarefa = ids[2];
+                let checkedValue = $(this).is(':checked');
+                $.ajax({
+                    type: 'PATCH',
+                    url: `api/listas/${id_lista}/tarefas/${id_tarefa}`,
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(
+                        {
+                            'concluida': checkedValue
+                        }
+                    ),
+                    complete: function(){
+
+                        let progressbar = document.getElementById("progresso");
+
+                        let qtd_concluidas = parseInt(localStorage.getItem('qtd_concluidas'), 10)
+                        if (checkedValue === true) {
+                            qtd_concluidas++;
+                            localStorage.setItem('qtd_concluidas', `${qtd_concluidas}`);
+                            document.getElementById('concluido_tarefa' + id_tarefa).setAttribute('checked', 'checked');
+                        } else {
+                            qtd_concluidas--;
+                            localStorage.setItem('qtd_concluidas', `${qtd_concluidas}`);
+                            document.getElementById('concluido_tarefa' + id_tarefa).removeAttribute('checked');
+                        }
+                        let qtd_tarefas = parseInt(localStorage.getItem('qtd_tarefas'), 10)
+                        progressbar.style.width = (qtd_concluidas * 100 / qtd_tarefas).toString() + '%';
+                    }
+                })
+            })
+            .on('click', '.excluir-tarefa', function () {
+                let ids = $(this).parent().parent().parent().parent().parent().attr('id').split('_');
+                let id_lista = ids[0];
+                let id_tarefa = ids[2];
+                $.ajax({
+                    type: 'DELETE',
+                    url: `api/listas/${id_lista}/tarefas/${id_tarefa}`,
+                    complete: function(){
+                        let progressbar = document.getElementById("progresso");
+                        let qtd_tarefas = parseInt(localStorage.getItem('qtd_tarefas'), 10) - 1;
+                        localStorage.setItem('qtd_tarefas', `${qtd_tarefas}`);
+                        let checkedValue = document.getElementById('concluido_tarefa' + id_tarefa).checked;
+
+                        let qtd_concluidas = parseInt(localStorage.getItem('qtd_concluidas'), 10);
+                        if (checkedValue === true) {
+                            qtd_concluidas--;
+                            localStorage.setItem('qtd_concluidas', `${qtd_concluidas}`);
+                        }
+
+                        let porcentagem = 0;
+                        if (qtd_tarefas !== 0) {
+                            porcentagem = qtd_concluidas * 100 / qtd_tarefas
+                        }
+
+                        progressbar.style.width = porcentagem.toString() + '%';
+                        id_tarefa = `${id_lista}_tarefa_${id_tarefa}`
+                        let tarefa = document.getElementById(id_tarefa);
+                        tarefa.remove();
+                    }
+                })
+            });
 
         function filterList() {
             let input = document.getElementById('busca');
@@ -171,97 +317,25 @@
             }
             else {
                 let ul, li, a, i, txtValue;
-                ul = document.getElementsByClassName("list-group-CUSTOM")[0];
-                li = ul.getElementsByClassName("list-group-item-CUSTOM");
+                ul = document.getElementById("listas");
+                li = ul.getElementsByClassName("list-group-item");
 
                 for (i = 0; i < li.length; i++) {
                     a = li[i];
                     txtValue = a.textContent || a.innerText;
 
-                    // split filter by spaces, gives ["app", "MN"] in your example
                     let filters = filter.split(" ")
-
-                    // remove the empty filters (if your filter string
-                    // starts or ends by a space) since they are source of errors
-
-                    // Array.filter takes in parameter a function returning a boolean
-                    // it create a new array containing only element where
-                    // the function returned truthy value
-
-                    // here we return the length of the string which is falsy (== 0) for ""
-                    // and truthy for every other string (!= 0)
                     filters = filters.filter(f => f.length)
 
                     let shouldDisplay = true
-                    // test each filter and store true only if string contains all filter
+
                     filters.forEach(filt => {
                         shouldDisplay = shouldDisplay && txtValue.toUpperCase().includes(filt)
                     })
 
-                    // update visibility
-                    // set visible if the string include all filters
-                    // or if there is no filter
                     li[i].style.display = (shouldDisplay || filters.length === 0) ? "" : "none";
                 }
             }
         }
-        let qtd_tarefas = {{ lista_ativa.tarefas|length }};
-        let qtd_concluidas = {{ porcentagem_conclusao }};
-        qtd_concluidas *= qtd_tarefas / 100;
-        $('#tarefas').on('click', 'input', function(){
-            let id = $(this).attr('id');
-            id = id.substring(id.indexOf('tarefa') + 6);
-            let checkedValue = $(this).is(':checked');
-            $.ajax({
-                type: 'PATCH',
-                url: '{{ url_for('listas') }}',
-                dataType: "json",
-                contentType: "application/json",
-                data: JSON.stringify(
-                    {
-                        'id_tarefa': id,
-                        'concluida': checkedValue
-                    }
-                ),
-                complete: function(){
-                    let progressbar = document.getElementById("progresso");
-                    if (checkedValue === true) {
-                        qtd_concluidas += 1;
-                        document.getElementById('concluido_tarefa' + id).setAttribute('checked', 'checked');
-                    }
-                    else {
-                        qtd_concluidas = Math.round(qtd_concluidas) - 1;
-                        document.getElementById('concluido_tarefa' + id).removeAttribute('checked');
-                    }
-                    progressbar.style.width = (qtd_concluidas * 100 / qtd_tarefas).toString() + '%';
-                }
-            })
-        }).on('click', '.excluir-tarefa', function () {
-            let id = $(this).attr('id');
-            id = id.substring(id.indexOf('tarefa') + 6);
-            let url = '{{ url_for('excluir_tarefa', id_tarefa=-1) }}';
-            $.ajax({
-                type: 'DELETE',
-                url: url.replace('-1', id),
-                complete: function(){
-                    let progressbar = document.getElementById("progresso");
-                    qtd_tarefas = Math.round(qtd_tarefas) - 1;
-                    let checkedValue = document.getElementById('concluido_tarefa' + id).checked;
-
-                    if (checkedValue === true) {
-                        qtd_concluidas = Math.round(qtd_concluidas) - 1;
-                    }
-
-                    let porcentagem = 0;
-                    if (qtd_tarefas !== 0) {
-                        porcentagem = qtd_concluidas * 100 / qtd_tarefas
-                    }
-
-                    progressbar.style.width = porcentagem.toString() + '%';
-                    let tarefa = document.getElementById("tarefa" + id);
-                    tarefa.remove();
-                }
-            })
-        });
     </script>
 {% endblock content %}
