@@ -149,7 +149,7 @@ def api_listas(id_lista):
             if not lista or lista.usuario.id != current_user.id:
                 return jsonify({'msg': 'Recurso não encontrado'})
 
-            Tarefa.delete().where(Tarefa.lista == id_lista)
+            Tarefa.delete().where(Tarefa.lista == id_lista).execute()
             lista.delete_instance()
             return jsonify({'msg': 'Recurso excluído com sucesso'})
 
