@@ -16,20 +16,21 @@
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form.nome(class="form-control mb-3 form-control-md", placeholder=lista.nome) }}
+                            {{ form.nome(class="form-control mb-3 form-control-md", value=lista.nome) }}
                         {% endif %}
                     </div>
                     <div>
-                        {{ form.descricao.label(class="form-control-label") }}
+
+                        <label class="form-control-label" for="descricao">Descrição da lista</label>
                         {% if form.descricao.errors %}
-                            {{ form.descricao(class="form-control form-control-md is-invalid") }}
+                            <textarea class="form-control mb-3 form-control-md is-invalid" id="descricao" name="descricao" required>{{ lista.descricao }}</textarea>
                             <div class="invalid-feedback">
                                 {% for error in form.descricao.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form.descricao(class="form-control mb-3 form-control-md", placeholder=lista.descricao) }}
+                            <textarea class="form-control mb-3 form-control-md" id="descricao" name="descricao" required>{{ lista.descricao }}</textarea>
                         {% endif %}
                     </div>
                     <div class="row">
