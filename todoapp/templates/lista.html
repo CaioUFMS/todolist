@@ -1,5 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
+    <div class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Título do modal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Texto do modal
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="btn-toolbar justify-content-between" aria-label="Toolbar with button groups">
+                            <button data-bs-dismiss="modal" id="cancelar" type="button" class="btn btn-secondary">Cancelar</button>
+                            <button data-bs-dismiss="modal" id="confirmar" type="button" class="btn btn-danger">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="mt-2 container-fluid">
         <div class="row">
             <div class="col-3">
@@ -102,25 +129,32 @@
         });
 
         function excluirLista(id_lista) {
-            $.ajax({
-                type: 'DELETE',
-                url: '/api/listas/' + id_lista,
-                complete: function(){
-                    let lista = document.getElementById('lista_' + id_lista);
-                    lista.remove();
-                    let ul = document.getElementById("listas");
-                    let li = ul.getElementsByClassName("list-group-item");
-                    if (li.length > 0) {
-                        li[0].click();
-                    }
-                    else {
-                        document.getElementById('nome_lista').innerText = 'Selecione ou crie uma lista!';
-                        document.getElementById('descricao_lista').innerText = '';
-                        document.getElementById('botoes_lista').classList.add('invisible');
-                        document.getElementsByClassName('progress')[0].classList.add('invisible');
-                    }
-                }
-            })
+            document.getElementsByClassName('modal-title')[0].innerText = 'Excluir lista';
+            document.getElementsByClassName('modal-body')[0].innerText = 'Tem certeza que deseja excluir essa lista?';
+            $('.modal').modal('show');
+
+            $('.modal .modal-footer').off()
+                .on('click', '#confirmar', function() {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/api/listas/' + id_lista,
+                        complete: function(){
+                            let lista = document.getElementById('lista_' + id_lista);
+                            lista.remove();
+                            let ul = document.getElementById("listas");
+                            let li = ul.getElementsByClassName("list-group-item");
+                            if (li.length > 0) {
+                                li[0].click();
+                            }
+                            else {
+                                document.getElementById('nome_lista').innerText = 'Selecione ou crie uma lista!';
+                                document.getElementById('descricao_lista').innerText = '';
+                                document.getElementById('botoes_lista').classList.add('invisible');
+                                document.getElementsByClassName('progress')[0].classList.add('invisible');
+                            }
+                        }
+                    })
+                });
         }
 
         function criarTarefa(id_lista) {
@@ -265,33 +299,40 @@
                 let ids = $(this).parent().parent().parent().parent().parent().attr('id').split('_');
                 let id_lista = ids[0];
                 let id_tarefa = ids[2];
-                $.ajax({
-                    type: 'DELETE',
-                    url: `api/listas/${id_lista}/tarefas/${id_tarefa}`,
-                    complete: function(){
-                        let progressbar = document.getElementById("progresso");
-                        let qtd_tarefas = parseInt(localStorage.getItem('qtd_tarefas'), 10) - 1;
-                        localStorage.setItem('qtd_tarefas', `${qtd_tarefas}`);
-                        let checkedValue = document.getElementById('concluido_tarefa' + id_tarefa).checked;
+                document.getElementsByClassName('modal-title')[0].innerText = 'Excluir tarefa';
+                document.getElementsByClassName('modal-body')[0].innerText = 'Tem certeza que deseja excluir essa tarefa?';
+                $('.modal').modal('show');
 
-                        let qtd_concluidas = parseInt(localStorage.getItem('qtd_concluidas'), 10);
-                        if (checkedValue === true) {
-                            qtd_concluidas--;
-                            localStorage.setItem('qtd_concluidas', `${qtd_concluidas}`);
-                        }
+                $('.modal .modal-footer').off()
+                    .on('click', '#confirmar', function () {
+                        $.ajax({
+                            type: 'DELETE',
+                            url: `api/listas/${id_lista}/tarefas/${id_tarefa}`,
+                            complete: function () {
+                                let progressbar = document.getElementById("progresso");
+                                let qtd_tarefas = parseInt(localStorage.getItem('qtd_tarefas'), 10) - 1;
+                                localStorage.setItem('qtd_tarefas', `${qtd_tarefas}`);
+                                let checkedValue = document.getElementById('concluido_tarefa' + id_tarefa).checked;
 
-                        let porcentagem = 0;
-                        if (qtd_tarefas !== 0) {
-                            porcentagem = qtd_concluidas * 100 / qtd_tarefas
-                        }
+                                let qtd_concluidas = parseInt(localStorage.getItem('qtd_concluidas'), 10);
+                                if (checkedValue === true) {
+                                    qtd_concluidas--;
+                                    localStorage.setItem('qtd_concluidas', `${qtd_concluidas}`);
+                                }
 
-                        progressbar.style.width = porcentagem.toString() + '%';
-                        id_tarefa = `${id_lista}_tarefa_${id_tarefa}`
-                        let tarefa = document.getElementById(id_tarefa);
-                        tarefa.remove();
-                    }
-                })
-            });
+                                let porcentagem = 0;
+                                if (qtd_tarefas !== 0) {
+                                    porcentagem = qtd_concluidas * 100 / qtd_tarefas
+                                }
+
+                                progressbar.style.width = porcentagem.toString() + '%';
+                                id_tarefa = `${id_lista}_tarefa_${id_tarefa}`
+                                let tarefa = document.getElementById(id_tarefa);
+                                tarefa.remove();
+                            }
+                        })
+                    });
+            })
 
         function filterList() {
             let input = document.getElementById('busca');
