@@ -16,15 +16,15 @@
 <nav class="navbar navbar-expand navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url_for('sobre') }}">
-            <img alt="logo" src="{{ url_for('static', filename='img/ToDoLogo.png') }}" class="logo">
+            <img style="height: 30px; width: auto" alt="logo" src="{{ url_for('static', filename='img/ToDoLogo1.png') }}" class="ps-3 logo">
         </a>
         <div class="navbar-nav">
             {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link nav-text" href="{{ url_for('listas') }}">Ver listas</a>
-                <a class="nav-item nav-link text-danger nav-text" href="{{ url_for('logout') }}">Sair</a>
+                <a class="nav-item nav-link" href="{{ url_for('listas') }}">Ver listas</a>
+                <a class="nav-item nav-link text-danger" href="{{ url_for('logout') }}">Sair</a>
             {% else %}
-                <a class="nav-item nav-link nav-text" href="{{ url_for('login') }}">Login</a>
-                <a class="nav-item nav-link nav-text" href="{{ url_for('cadastro') }}">Cadastro</a>
+                <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
+                <a class="nav-item nav-link" href="{{ url_for('cadastro') }}">Cadastro</a>
             {% endif %}
         </div>
     </div>
