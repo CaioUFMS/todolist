@@ -131,15 +131,15 @@ function desenharTarefa(tarefa) {
                                 ${tarefa['descricao']}
                             </p>
                         </div>
-                        <div class="card-footer bg-transparent">
+                        <div class="card-footer bg-transparent justify-content-between d-flex">
                             <div class="form-check">
                                 <label class="form-check-label" for="concluido_tarefa${tarefa['id']}">
                                     Feito!
                                 </label>
                                 <input class="form-check-input" type="checkbox" name="exampleRadios"
-                                       id="concluido_tarefa${tarefa['id']}" value="option1" ${concluida}>
-
+                                       id="concluido_tarefa${tarefa['id']}" value="option1" ${concluida}>                            
                             </div>
+                            <p class="mb-0">${tarefa['data']}</p>
                         </div>
                     </div>
                 </div>

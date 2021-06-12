@@ -47,7 +47,7 @@
                         </div>
                     </div>
                     <div>
-                        {{ form.descricao.label(class="form-control-label") }}
+                        {{ form.descricao.label(class="form-label") }}
                         {% if form.descricao.errors %}
                             {{ form.descricao(class="form-control form-control-md is-invalid") }}
                             <div class="invalid-feedback">
@@ -60,10 +60,14 @@
                         {% endif %}
                     </div>
                     <div class="row">
-                        <div class="col float-start">
-                            <a class="btn btn-secondary btn-md float-start" href="{{ url_for('listas', id_lista=id_lista) }}">Cancelar</a>
+                        <div class="col">
+                            <input class="form-control pe-0" type="date" name="data" id="data" value="{{ tarefa.data }}">
+                            <label for="data">Data limite</label>
                         </div>
-                        <div class="col float-end">
+                        <div class="col">
+                            <a class="btn btn-secondary btn-md" href="{{ url_for('listas', id_lista=id_lista) }}">Cancelar</a>
+                        </div>
+                        <div class="col">
                             {{ form.submit(class="btn btn-primary float-end") }}
                         </div>
                     </div>

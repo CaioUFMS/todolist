@@ -2,6 +2,7 @@ from peewee import *
 from playhouse.shortcuts import model_to_dict
 from todoapp import login_manager
 from flask_login import UserMixin
+from datetime import date
 
 db = SqliteDatabase('todoapp/app.db')
 
@@ -50,4 +51,5 @@ class Tarefa(BaseModel):
     descricao = TextField()
     concluida = BooleanField(default=False)
     cor = CharField(default="rgb(255, 255, 255)")
+    data = DateField(default=lambda: date.today().strftime('%Y-%m-%d'))
     lista = ForeignKeyField(Lista, backref='tarefas')

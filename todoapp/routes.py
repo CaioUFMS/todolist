@@ -1,11 +1,11 @@
 from flask import render_template, url_for, flash, redirect, request, jsonify
 from peewee import JOIN
-
 from todoapp.forms import FormCadastro, FormLogin, FormLista, FormTarefa
 from flask_login import login_user, current_user, logout_user, login_required
 from todoapp.models import Usuario, Lista, Tarefa, DoesNotExist
 from todoapp import app, bcrypt
 from playhouse.shortcuts import model_to_dict
+from datetime import date
 
 
 @app.route('/')
@@ -94,6 +94,7 @@ def editar_tarefa(id_lista, id_tarefa):
             tarefa.cor = form.cor.data
         else:
             tarefa.cor = 'rgb(255, 255, 255)'
+        tarefa.data = form.data.data
         tarefa.save()
         flash('Tarefa alterada com sucesso!', 'success')
         return redirect(url_for('listas', id_lista=id_lista))
@@ -117,7 +118,13 @@ def api_listas(id_lista):
                 return jsonify({'msg': 'Recurso não encontrado'})
 
             model = model_to_dict(lista, recurse=False)
-            model.update({'tarefas': [model_to_dict(tarefa, recurse=False) for tarefa in lista.tarefas]})
+            tarefas = []
+            for tarefa in lista.tarefas:
+                tarefa_dict = model_to_dict(tarefa, recurse=False)
+                tarefa_dict['data'] = tarefa.data.strftime('%d/%m/%y')
+                tarefas.append(tarefa_dict)
+            model.update({'tarefas': tarefas})
+
             return jsonify(model)
 
         listas = Lista.select(Lista.id, Lista.nome).where(Lista.usuario == current_user.id)
