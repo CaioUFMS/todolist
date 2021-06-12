@@ -74,6 +74,7 @@ function excluirLista(id_lista) {
                         li[0].click();
                     }
                     else {
+                        $('#tarefas').empty();
                         document.getElementById('nome_lista').innerText = 'Selecione ou crie uma lista!';
                         document.getElementById('descricao_lista').innerText = '';
                         document.getElementById('botoes_lista').classList.add('invisible');
