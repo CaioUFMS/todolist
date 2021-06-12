@@ -5,7 +5,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from todoapp.models import Usuario, Lista, Tarefa, DoesNotExist
 from todoapp import app, bcrypt
 from playhouse.shortcuts import model_to_dict
-from datetime import date
+from datetime import datetime
 
 
 @app.route('/')
@@ -180,7 +180,9 @@ def api_tarefas(id_lista, id_tarefa):
     elif request.method == 'POST':
         data = request.json
         tarefa = Tarefa.create(titulo='Tarefa', descricao='Descrição da tarefa.', lista=id_lista)
-        return jsonify(model_to_dict(tarefa, recurse=False))
+        model = model_to_dict(tarefa, recurse=False)
+        model['data'] = datetime.strptime(tarefa.data, '%Y-%m-%d').strftime('%d/%m/%y')
+        return jsonify(model)
 
     elif request.method == 'PATCH':
         if not id_tarefa:

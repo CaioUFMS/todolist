@@ -168,6 +168,13 @@ $('#listas').on('click', 'button', function() {
             let qtd_concluidas = 0;
             let qtd_tarefas = 0;
             if (tarefas) {
+                tarefas.sort(function(a, b) {
+                    let data1 = `${a['data']}`.split('/');
+                    data1 = parseInt(`${data1[2]}${data1[1]}${data1[0]}`);
+                    let data2 = `${b['data']}`.split('/');
+                    data2 = parseInt(`${data2[2]}${data2[1]}${data2[0]}`);
+                    return a['concluida'] - b['concluida'] || data1 - data2;
+                })
                 for (let i = 0; i < tarefas.length; i++) {
                     desenharTarefa(tarefas[i]);
                     if (tarefas[i]['concluida'] === true) {
