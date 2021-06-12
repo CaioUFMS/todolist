@@ -11,3 +11,4 @@ login_manager.login_message_category = 'info'
 login_manager.login_message = 'Faça login antes de acessar esta página.'
 
 from todoapp import routes
+from todoapp import api
