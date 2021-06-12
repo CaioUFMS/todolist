@@ -3,6 +3,10 @@ function recuperaListas() {
         type: 'GET',
         url: '/api/listas',
         complete: function(response){
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const id_lista = urlParams.get('id_lista');
+
             let json = response.responseJSON;
             for (let i = 0; i < json.length; i++) {
                 let nova_lista = document.createElement('button');
@@ -14,8 +18,13 @@ function recuperaListas() {
                 nova_lista.innerText = json[i]['nome'];
                 nova_lista.style.border = 'none';
                 document.getElementById("listas").append(nova_lista);
-                if (i === 0) {
+                if (i === 0 && id_lista == null) {
                     nova_lista.click();
+                }
+                else {
+                    if (id_lista === `${json[i]['id']}`) {
+                        nova_lista.click();
+                    }
                 }
             }
         }
