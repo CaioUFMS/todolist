@@ -66,6 +66,7 @@ def editar_lista(id_lista):
         lista.save()
         flash('Lista alterada com sucesso!', 'success')
         return redirect(url_for('listas', id_lista=lista.id))
+    form.descricao.data = lista.descricao
     return render_template('editar_lista.html', lista=lista, form=form)
 
 
