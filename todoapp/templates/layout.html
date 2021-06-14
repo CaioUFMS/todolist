@@ -16,44 +16,44 @@
 
 </head>
 <body>
-    {% if current_user.is_authenticated %}
-        <header id="header" class="nav-main">
-            <div class="container-fluid d-flex justify-content-lg-between" >
+{% if current_user.is_authenticated %}
+    <header id="header" class="nav-main">
+        <div class="container-fluid d-flex justify-content-lg-between" >
 
-                <a href="{{ url_for('sobre') }}" class="logo me-auto me-lg-0"><img src="{{ url_for('static', filename='img/ToDoLogoBranco.png') }}" alt="" class="img-fluid"></a>
+            <a href="{{ url_for('sobre') }}" class="logo me-auto me-lg-0"><img src="{{ url_for('static', filename='img/ToDoLogoBranco.png') }}" alt="" class="img-fluid"></a>
 
-                <div class="my-2 my-lg-0">
-                    <a href="{{ url_for('listas') }}" class="get-started-btn">Ver Listas</a>
-                    <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
-                </div>
+            <div class="my-2 my-lg-0">
+                <a href="{{ url_for('listas') }}" class="get-started-btn">Ver Listas</a>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
             </div>
-        </header><!-- End Header -->
+        </div>
+    </header><!-- End Header -->
 
-    {% else %}
-        <header id="header" class="nav-main">
-            <div class="container-fluid d-flex justify-content-lg-between" >
+{% else %}
+    <header id="header" class="nav-main">
+        <div class="container-fluid d-flex justify-content-lg-between" >
 
-                <a href="{{ url_for('sobre') }}" class="logo me-auto me-lg-0"><img src="{{ url_for('static', filename='img/ToDoLogoBranco.png') }}" alt="" class="img-fluid"></a>
-                <ul class="nav">
-                    <li class="nav-item">
-                        <a class="nav-link nav-options nav-item-hover" href="#hero" >Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-options nav-item-hover" href="#about">Sobre</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-options nav-item-hover" href="#team">Grupo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-options nav-item-hover"  href="{{ url_for('cadastro') }}" >Cadastre-se</a>
-                    </li>
-                </ul>
-                <a href="{{ url_for('login') }}" class="get-started-btn scrollto">Login</a>
-            </div>
-        </header><!-- End Header -->
+            <a href="{{ url_for('sobre') }}" class="logo me-auto me-lg-0"><img src="{{ url_for('static', filename='img/ToDoLogoBranco.png') }}" alt="" class="img-fluid"></a>
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link nav-options nav-item-hover" href="#hero" >Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-options nav-item-hover" href="#about">Sobre</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-options nav-item-hover" href="#team">Grupo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-options nav-item-hover"  href="{{ url_for('cadastro') }}" >Cadastre-se</a>
+                </li>
+            </ul>
+            <a href="{{ url_for('login') }}" class="get-started-btn scrollto">Login</a>
+        </div>
+    </header><!-- End Header -->
 
-        <!--OUTRA OPÇÃO DE NAV-->
-        <!--<header id="header" class="fixed-top ">
+    <!--OUTRA OPÇÃO DE NAV-->
+    <!--<header id="header" class="fixed-top ">
             <div class="container d-flex align-items-center justify-content-lg-between">
 
                 <a href="{{ url_for('sobre') }}" class="logo me-auto me-lg-0"><img src="{{ url_for('static', filename='img/ToDoLogoBranco.png') }}" alt="" class="img-fluid"></a>
@@ -73,20 +73,21 @@
             </div>
         </header>-->
 
-    {% endif %}
+{% endif %}
 
-    <div>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
-    </div>
+<div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
 
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
