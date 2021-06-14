@@ -3,46 +3,89 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+
     <link rel="icon" href="{{ url_for('static', filename='img/ToDoIcon.png') }}">
     {% if title %}
         <title>ToDo - {{ title }}</title>
     {% else %}
         <title>ToDo</title>
     {% endif %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assets/css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+
 </head>
 <body>
-<nav class="navbar navbar-expand navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url_for('sobre') }}">
-            <img style="height: 30px; width: auto" alt="logo" src="{{ url_for('static', filename='img/ToDoLogo1.png') }}" class="ps-3 logo">
-        </a>
-        <div class="navbar-nav">
-            {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="{{ url_for('listas') }}">Ver listas</a>
-                <a class="nav-item nav-link text-danger" href="{{ url_for('logout') }}">Sair</a>
-            {% else %}
-                <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-                <a class="nav-item nav-link" href="{{ url_for('cadastro') }}">Cadastro</a>
-            {% endif %}
-        </div>
-    </div>
-</nav>
+    {% if current_user.is_authenticated %}
+        <header id="header" class="nav-main">
+            <div class="container-fluid d-flex justify-content-lg-between" >
 
-<div class="container-fluid">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <a href="{{ url_for('sobre') }}" class="logo me-auto me-lg-0"><img src="{{ url_for('static', filename='img/ToDoLogoBranco.png') }}" alt="" class="img-fluid"></a>
+
+                <div class="my-2 my-lg-0">
+                    <a href="{{ url_for('listas') }}" class="get-started-btn">Ver Listas</a>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
-</div>
+            </div>
+        </header><!-- End Header -->
+
+    {% else %}
+        <header id="header" class="nav-main">
+            <div class="container-fluid d-flex justify-content-lg-between" >
+
+                <a href="{{ url_for('sobre') }}" class="logo me-auto me-lg-0"><img src="{{ url_for('static', filename='img/ToDoLogoBranco.png') }}" alt="" class="img-fluid"></a>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link nav-options nav-item-hover" href="#hero" >Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-options nav-item-hover" href="#about">Sobre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-options nav-item-hover" href="#team">Grupo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-options nav-item-hover"  href="{{ url_for('cadastro') }}" >Cadastre-se</a>
+                    </li>
+                </ul>
+                <a href="{{ url_for('login') }}" class="get-started-btn scrollto">Login</a>
+            </div>
+        </header><!-- End Header -->
+
+        <!--OUTRA OPÇÃO DE NAV-->
+        <!--<header id="header" class="fixed-top ">
+            <div class="container d-flex align-items-center justify-content-lg-between">
+
+                <a href="{{ url_for('sobre') }}" class="logo me-auto me-lg-0"><img src="{{ url_for('static', filename='img/ToDoLogoBranco.png') }}" alt="" class="img-fluid"></a>
+
+                <nav id="navbar" class="navbar order-last order-lg-0">
+                    <ul>
+                        <li><a class="nav-link nav-options" href="#hero" style="font-size: 1em; color: #ffc451;">Home</a></li>
+                        <li><a class="nav-link nav-options" href="#about" style="font-size: 1em; color: #ffc451;">Sobre</a></li>
+                        <li><a class="nav-link nav-options" href="#team" style="font-size: 1em; color: #ffc451;">Grupo</a></li>
+                        <li><a class="nav-link nav-options"  href="{{ url_for('cadastro') }}" style="font-size: 1em; color: #ffc451;">Cadastre-se</a></li>
+                    </ul>
+                    <i class="bi bi-list mobile-nav-toggle"></i>
+                </nav>
+
+                <a href="{{ url_for('login') }}" class="get-started-btn scrollto">Login</a>
+
+            </div>
+        </header>-->
+    {% endif %}
+
+    <div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
 
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
